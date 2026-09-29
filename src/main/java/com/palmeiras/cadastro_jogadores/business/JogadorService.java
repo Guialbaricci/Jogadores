@@ -22,4 +22,24 @@ public class JogadorService {
                 () -> new RuntimeException("Nome não encontrado!")
         );
     }
+
+    public void deletarJogadorPorNome(String nome){
+        repository.deleteByName(nome);
+    }
+
+    public void atualizarJogadorPorId(Integer id, Jogador jogador){
+        Jogador jogadorEntity = repository.findById(id).orElseThrow(() ->
+                new RuntimeException("Jogador não encontrado"));
+        Jogador jogadorAtualizado = Jogador.builder()
+                .nome(jogador.getNome() != null ? jogador.getNome() :
+                        jogadorEntity.getNome())
+                .idade(jogador.getIdade() != null ? jogador.getIdade() :
+                        jogadorEntity.getIdade())
+                .nacionalidade(jogador.getNacionalidade() != null ? jogador.getNacionalidade() :
+                        jogadorEntity.getNacionalidade())
+                .gols(jogador.getGols() != null ? jogador.getGols() :
+                        jogadorEntity.getGols())
+                .id(jogadorEntity.getId())
+                .build();
+    }
 }
