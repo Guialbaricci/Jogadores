@@ -11,5 +11,5 @@ public interface JogadorRepository extends JpaRepository<Jogador,Integer> {
     Optional<Jogador> findByNome(String nome);
 
     @Transactional
-    void deleteByName(String name);
+    void deleteByNome(String nome);
 }

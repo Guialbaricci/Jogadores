@@ -24,12 +24,13 @@ public class JogadorService {
     }
 
     public void deletarJogadorPorNome(String nome){
-        repository.deleteByName(nome);
+        repository.deleteByNome(nome);
     }
 
     public void atualizarJogadorPorId(Integer id, Jogador jogador){
         Jogador jogadorEntity = repository.findById(id).orElseThrow(() ->
                 new RuntimeException("Jogador não encontrado"));
+
         Jogador jogadorAtualizado = Jogador.builder()
                 .nome(jogador.getNome() != null ? jogador.getNome() :
                         jogadorEntity.getNome())
@@ -41,5 +42,7 @@ public class JogadorService {
                         jogadorEntity.getGols())
                 .id(jogadorEntity.getId())
                 .build();
+
+        repository.saveAndFlush(jogadorAtualizado);
     }
 }
