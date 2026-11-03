@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palmeiras | Jogadores</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="container topo-conteudo">
+      <div>
+        <p class="marca">PALMEIRAS</p>
+        <h1>Cadastro de jogadores</h1>
+      </div>
+      <span class="status-api" id="statusApi">Conectando...</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="barra-acoes">
+      <form id="formPesquisa" class="pesquisa">
+        <input id="pesquisaNome" type="search" placeholder="Pesquisar jogador pelo nome">
+        <button class="botao botao-secundario" type="submit">Pesquisar</button>
+        <button class="botao botao-texto" id="btnMostrarTodos" type="button">Mostrar todos</button>
+      </form>
+      <button class="botao botao-principal" id="btnNovo" type="button">+ Novo jogador</button>
+    </section>
+
+    <div id="mensagem" class="mensagem" role="status" aria-live="polite"></div>
+
+    <section class="painel">
+      <div class="painel-titulo">
+        <div>
+          <h2>Elenco cadastrado</h2>
+          <p id="contador">Carregando jogadores...</p>
+        </div>
+      </div>
+      <div class="tabela-responsiva">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Idade</th>
+              <th>Nacionalidade</th>
+              <th>Gols</th>
+              <th class="coluna-acoes">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaJogadores">
+            <tr><td colspan="6" class="vazio">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="painel formulario-painel" id="painelFormulario" hidden>
+      <div class="painel-titulo">
+        <div>
+          <h2 id="tituloFormulario">Novo jogador</h2>
+          <p>Preencha os dados abaixo.</p>
+        </div>
+      </div>
+      <form id="formJogador">
+        <input type="hidden" id="jogadorId">
+        <div class="campos">
+          <label>Nome
+            <input id="nome" type="text" maxlength="200" required>
+          </label>
+          <label>Idade
+            <input id="idade" type="number" min="0" max="120" required>
+          </label>
+          <label>Nacionalidade
+            <input id="nacionalidade" type="text" maxlength="100" required>
+          </label>
+          <label>Gols
+            <input id="gols" type="number" min="0" required>
+          </label>
+        </div>
+        <div class="form-acoes">
+          <button class="botao botao-principal" id="btnSalvar" type="submit">Salvar jogador</button>
+          <button class="botao botao-secundario" id="btnCancelar" type="button">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="container rodape">Sistema de cadastro conectado à API Spring Boot.</footer>
+  <script src="script.js"></script>
+</body>
+</html>
