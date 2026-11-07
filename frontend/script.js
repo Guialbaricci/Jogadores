@@ -16,26 +16,38 @@ function mostrarMensagem(texto, tipo = "sucesso") {
   mostrarMensagem.timer = window.setTimeout(() => mensagem.className = "mensagem", 4500);
 }
 
+// Troca caracteres especiais (<, >, &...) por códigos seguros.
+// Evita que um nome como "<script>" seja executado na página (ataque XSS)
 function escaparHtml(valor) {
   return String(valor ?? "").replace(/[&<>"']/g, caractere => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
   })[caractere]);
 }
 
+// Função única para falar com a API (GET, POST, PUT, DELETE)
 async function requisicao(url, opcoes = {}) {
+  // Só avisa que é JSON quando existe corpo (POST/PUT). Em GET/DELETE isso gerava uma requisição extra de verificação do CROSS sem necessidade.
+  const headers = opcoes.body ? { "Content-Type": "application/json" } : {};
   const resposta = await fetch(url, {
     ...opcoes,
-    headers: { "Content-Type": "application/json", ...(opcoes.headers || {}) }
+    headers: { ...headers, ...(opcoes.headers || {}) }
   });
+
   if (!resposta.ok) {
+    // O Spring devolve o erro em JSON ({"message": "..."}); pegamos só o texto da mensagem
     const detalhe = await resposta.text();
-    throw new Error(detalhe || `Erro HTTP ${resposta.status}`);
+    let texto = detalhe;
+    try { texto = JSON.parse(detalhe).message || detalhe; } catch { /* não era JSON, usa o texto puro */ }
+    throw new Error(texto || `Erro HTTP ${resposta.status}`);
   }
+
   if (resposta.status === 204) return null;
+  // Algumas respostas (POST/PUT/DELETE) vêm vazias, então não dá para chamar .json() direto
   const texto = await resposta.text();
   return texto ? JSON.parse(texto) : null;
 }
 
+// Monta as linhas da tabela a partir da lista de jogadores
 function desenharTabela(lista) {
   jogadoresExibidos = lista;
   contador.textContent = `${lista.length} jogador(es) encontrado(s)`;
@@ -61,6 +73,7 @@ function desenharTabela(lista) {
   `).join("");
 }
 
+// Busca todos os jogadores na API e mostra na tabela
 async function carregarJogadores() {
   statusApi.textContent = "Conectando...";
   tabela.innerHTML = '<tr><td colspan="6" class="vazio">Carregando...</td></tr>';
@@ -77,6 +90,7 @@ async function carregarJogadores() {
   }
 }
 
+// Abre o formulário. Sem argumento = novo jogador; com jogador = edição (já preenchido)
 function abrirFormulario(jogador = null) {
   formJogador.reset();
   document.getElementById("jogadorId").value = jogador?.id ?? "";
@@ -102,6 +116,7 @@ document.getElementById("btnMostrarTodos").addEventListener("click", () => {
   carregarJogadores();
 });
 
+// Pesquisa por nome (a busca é exata: precisa digitar o nome completo)
 document.getElementById("formPesquisa").addEventListener("submit", async evento => {
   evento.preventDefault();
   const nome = document.getElementById("pesquisaNome").value.trim();
@@ -116,6 +131,7 @@ document.getElementById("formPesquisa").addEventListener("submit", async evento 
   }
 });
 
+// Salvar: se o campo escondido "jogadorId" tem valor -> edição (PUT); senão -> cadastro (POST)
 formJogador.addEventListener("submit", async evento => {
   evento.preventDefault();
   const id = document.getElementById("jogadorId").value;
@@ -154,6 +170,8 @@ formJogador.addEventListener("submit", async evento => {
   }
 });
 
+// Um único "ouvinte" na tabela cuida dos botões Editar/Excluir de todas as linhas
+// (as linhas são criadas dinamicamente, então não dá para ligar o clique em cada botão antes)
 tabela.addEventListener("click", async evento => {
   const botao = evento.target.closest("button[data-acao]");
   if (!botao) return;
